@@ -2,7 +2,10 @@
 import time
 import serial
 import binascii
+import xml.dom.minidom as dom
+import os.path
 
+directory = "/home/ecki/kreuzschiene/config/"
 
 class kreuzschiene:
 
@@ -69,7 +72,7 @@ class kreuzschiene:
           self.length = 0
           self.output = []
           self.f_detect_ser()
-          config = self.f_read_config("default.cfg")
+          config = self.f_read_config("default")
           if config != "none":
              print("schreibe neue config solange bis config = zustand")
           self.f_open_net_server()
@@ -127,15 +130,77 @@ class kreuzschiene:
 
       def f_read_config(self,name):
           print("read config")
-          return "none"
+          configfile = directory+name+".cfg"
+          #print(configfile)
+          if os.path.isfile(configfile):
+             outlist = []
+             inlist = []
+             print("read config file")
+             baum = dom.parse(configfile)
+             erstesKind = baum.firstChild
+             for eintrag in baum.firstChild.childNodes:
+                 if eintrag.nodeName == "output":
+                    #print(eintrag.getAttribute("id"))
+                    outlist.append(int(eintrag.getAttribute("id")))
+                    #print(eintrag.getAttribute("expr"))
+                    inlist.append(int(eintrag.getAttribute("expr")))
+             #print(outlist)
+             #print(inlist)
+             ergebnis = self.f_sort_lists(outlist,inlist)
+             #print(ergebnis[0])
+             #print(ergebnis[1])
+             #print(ergebnis[2])
+             if ergebnis[2] != self.length:
+                 print("config file hat nicht richtige anzahl output")
+                 return False
+             else:
+                 i = 0
+                 while i < self.length:
+                     self.f_set_output(i,ergebnis[1][i])
+                     i = i + 1
+                 return True
+          else:
+             print("no configfile found")
+             return "none"
+
+      def f_write_config(self,name):
+          print("write config")
+          configfile = open(directory+name+".cfg",'w')
+          configfile.write("<kreuzschiene>\n")
+          i = 0
+          while i < self.length:
+              configfile.write("  <output id='"+str(i)+"' expr='"+str(self.output[i])+"'/>\n")
+              i = i + 1
+          configfile.write("</kreuzschiene>\n")
+          configfile.close()
+          return True
+
+      def f_sort_lists(self,outlist,inlist):
+          if len(outlist) != len(inlist):
+              print("nicht sortierbar")
+              return False
+          i = 0
+          while i < len(outlist):
+                k = i
+                j = i
+                while k < len(outlist):
+                      if outlist[j] > outlist[k]:
+                         j = k
+                      k = k + 1
+                iners = inlist[i]
+                inlist[i] = inlist[j]
+                inlist[j] = iners
+                outers = outlist[i]
+                outlist[i] = outlist[j]
+                outlist[j] = outers
+                i = i + 1
+          return [outlist,inlist,i]
 
       def f_open_net_server(self):
           print("open network port")
 
 if __name__ == '__main__':
    kreuz = kreuzschiene()
-   kreuz.f_read_status()
-   kreuz.f_set_output(0,10)
-   kreuz.f_set_output(0,5)
+   kreuz.f_read_config("test")
    kreuz.end()
 
