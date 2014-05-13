@@ -2,7 +2,7 @@
 import time
 import serial
 import binascii
-
+import xml.dom.minidom as dom
 
 class kreuzschiene:
 
@@ -69,7 +69,7 @@ class kreuzschiene:
           self.length = 0
           self.output = []
           self.f_detect_ser()
-          config = self.f_read_config("default.cfg")
+          config = self.f_read_config("default")
           if config != "none":
              print("schreibe neue config solange bis config = zustand")
           self.f_open_net_server()
@@ -127,6 +127,11 @@ class kreuzschiene:
 
       def f_read_config(self,name):
           print("read config")
+          configfile = "~/kreuzschiene/config/"+name+".cfg"
+          baum = dom.parse(configfile)
+          erstesKind = baum.firstChild
+          for eintrag in baum.firstChild.childNodes:
+              print(eintrag.nodeName)
           return "none"
 
       def f_open_net_server(self):
@@ -134,8 +139,6 @@ class kreuzschiene:
 
 if __name__ == '__main__':
    kreuz = kreuzschiene()
-   kreuz.f_read_status()
-   kreuz.f_set_output(0,10)
-   kreuz.f_set_output(0,5)
+   kreuz.f_read_config(test)
    kreuz.end()
 
