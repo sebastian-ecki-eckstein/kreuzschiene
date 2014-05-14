@@ -15,6 +15,12 @@ class kreuzschiene:
           print(self.ser.name)
           self.f_generate_matrix()
 
+      def f_get_data(self):
+          return [self.output,self.outputname,self.inputname]
+
+      def f_get_config(self):
+          return [test]
+
       def f_generate_matrix(self):
           print("generate output, input matrix")
           bytestring = self.f_read_status()

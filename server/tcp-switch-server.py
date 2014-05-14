@@ -61,8 +61,12 @@ class kreuz_tcp_server:
           if command[0] == "GET":
              if command[1] == "DATA":
                 print("get data")
+                daten = self.kreuz.f_get_data()
+                conn.send("ACK:DATA:"+daten[0]+":"+daten[1]+":"+daten[2])
              if command[1] == "CONFIG":
                 print("get config files")
+                config = self.kreuz.f_get_config()
+                conn.send("ACK:DATA:"+config)
 
       def __init__(self,ip='127.0.0.1',port=4242):
           self.TCP_IP = ip
