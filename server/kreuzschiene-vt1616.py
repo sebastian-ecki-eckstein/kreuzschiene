@@ -76,7 +76,7 @@ class kreuzschiene:
           self.inputname = []
           self.outputname = []
           self.f_detect_ser()
-          config = self.f_read_config("default")
+          config = self.f_read_config("boot")
 
       def f_read_status(self):
           print("read")
