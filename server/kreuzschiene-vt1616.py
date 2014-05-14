@@ -15,6 +15,12 @@ class kreuzschiene:
           print(self.ser.name)
           self.f_generate_matrix()
 
+      def f_get_data(self):
+          return [self.output,self.outputname,self.inputname]
+
+      def f_get_config(self):
+          return [test]
+
       def f_generate_matrix(self):
           print("generate output, input matrix")
           bytestring = self.f_read_status()
@@ -22,6 +28,8 @@ class kreuzschiene:
           self.length = parsed[0]
           for i in range(self.length):
               self.output.append(0)
+              self.outputname.append("out_"+str(i))
+              self.inputname.append("in_"str(i))
           parsed = self.f_parse_status(bytestring)
           self.f_compare_output(parsed)
           return True
@@ -71,11 +79,10 @@ class kreuzschiene:
           print("init")
           self.length = 0
           self.output = []
+          self.inputname = []
+          self.outputname = []
           self.f_detect_ser()
-          config = self.f_read_config("default")
-          if config != "none":
-             print("schreibe neue config solange bis config = zustand")
-          self.f_open_net_server()
+          config = self.f_read_config("boot")
 
       def f_read_status(self):
           print("read")
@@ -125,6 +132,22 @@ class kreuzschiene:
           else:
               return False
 
+      def f_set_output_name(self,number,name):
+          if number > self.length or number < 0:
+             print("output not found")
+             return False
+          else:
+             self.outputname[number] = str(chomp(name))
+             return True
+
+      def f_set_input_name(self,number,name):
+          if number > self.length or number < 0:
+             print("input not found")
+             return False
+          else:
+             self.inputname[number] = str(chomp(name))
+             return True
+
       def end(self):
           self.ser.close()
 
@@ -135,6 +158,9 @@ class kreuzschiene:
           if os.path.isfile(configfile):
              outlist = []
              inlist = []
+             outputname = []
+             inputname = []
+             inputlist = []
              print("read config file")
              baum = dom.parse(configfile)
              erstesKind = baum.firstChild
@@ -144,9 +170,15 @@ class kreuzschiene:
                     outlist.append(int(eintrag.getAttribute("id")))
                     #print(eintrag.getAttribute("expr"))
                     inlist.append(int(eintrag.getAttribute("expr")))
+                    outputname.append(str(eintrag.getAttribute("name")))
+                 if eintrag.nodeName == "input":
+                    inputlist.append(int(eintrag.getAttribute("id")))
+                    inputname.append(str(eintrag.getAttribute("name")))
              #print(outlist)
              #print(inlist)
              ergebnis = self.f_sort_lists(outlist,inlist)
+             sort_outputname = self.f_sort_lists(outlist,outputname)
+             sort_inputname = self.f_sort_lists(inputlist,inputname)
              #print(ergebnis[0])
              #print(ergebnis[1])
              #print(ergebnis[2])
@@ -157,6 +189,8 @@ class kreuzschiene:
                  i = 0
                  while i < self.length:
                      self.f_set_output(i,ergebnis[1][i])
+                     self.f_set_output_name(i,sort_outputname[i])
+                     self.f_set_input_name(i,sort_inputname[i])
                      i = i + 1
                  return True
           else:
@@ -169,7 +203,8 @@ class kreuzschiene:
           configfile.write("<kreuzschiene>\n")
           i = 0
           while i < self.length:
-              configfile.write("  <output id='"+str(i)+"' expr='"+str(self.output[i])+"'/>\n")
+              configfile.write("  <output id='"+str(i)+"' expr='"+str(self.output[i])+"'+" name='"+str(self.outputname[i])+"'/>\n")
+              configfile.write("  <input id='"+str(i)+"' name='"+str(self.inputname[i])+"'/>\n")
               i = i + 1
           configfile.write("</kreuzschiene>\n")
           configfile.close()
@@ -196,11 +231,8 @@ class kreuzschiene:
                 i = i + 1
           return [outlist,inlist,i]
 
-      def f_open_net_server(self):
-          print("open network port")
-
 if __name__ == '__main__':
    kreuz = kreuzschiene()
-   kreuz.f_read_config("test")
+   kreuz.f_write_config("test")
    kreuz.end()
 
