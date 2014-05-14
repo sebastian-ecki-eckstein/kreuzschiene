@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import socket
-import kreuzschiene from kreuzschiene-vt1616.py
+from kreuzschiene_vt1616 import kreuzschiene
 
 class kreuz_tcp_server:
 
@@ -14,55 +14,77 @@ class kreuz_tcp_server:
                 print("lock/unlock device")
                 if self.lock == "":
                    self.lock = str(command[2]).rstrip()
-                   conn.send("ACK:LOCK:LOCK")
+                   conn.send("ACK:LOCK:LOCK".encode('UTF-8'))
                 else:
                    if self.lock == str(command[2]).rstrip():
                       self.lock == ""
-                      conn.send("ACK:LOCK:UNLOCK")
+                      conn.send("ACK:LOCK:UNLOCK".encode('UTF-8'))
                    else:
-                      conn.send("NACK:LOCK:LOCK")
+                      conn.send("NACK:LOCK:LOCK".encode('UTF-8'))
           if command[0] == "SET" and self.lock == "":
              if command[1] == "PORT":
                 print("set port")
                 if command[2][0]=="O" and command[3][0]=="I":
                    print("set output to input")
                    if self.kreuz.f_set_output(int(command[2][1:]),int(command[3][1:])):
-                      conn.send("ACK:PORT:O"+str(int(command[2][1:])).zfill(2)+":I"+str(int(command[3][1:])).zfill(2)+"\r\n")
+                       backstr = "ACK:PORT:O"
                    else:
-                      conn.send("NACK:PORT:O"+str(int(command[2][1:])).zfill(2)+":I"+str(int(command[3][1:])).zfill(2)+"\r\n")
+                       backstr = "NACK:PORT:0"
+                   backstr=backstr+str(int(command[2][1:])).zfill(2)+":I"+str(int(command[3][1:])).zfill(2)+"\r\n"
+                   conn.send(backstr.encode('UTF-8'))
              if command[1] == "NAME":
                 print("set name")
-                if command[2][1]=="O":
+                if command[2][0]=="O":
                    print("set output name")
                    if self.kreuz.f_set_output_name(int(command[2][1:]),str(command[3]).rstrip()):
-                      conn.send("ACK:NAME:O"+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n")
+                      backstr = "ACK:NAME:O"
                    else:
-                      conn.send("NACK:NAME:O"+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n")
-                if command[2][1]=="I":
+                       backstr = "NACK:NAME:O"
+                   backstr = backstr+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n"
+                   conn.send(backstr.encode('UTF-8'))
+                if command[2][0]=="I":
                    print("set input name")
                    if self.kreuz.f_set_input_name(int(command[2][1:]),str(command[3]).rstrip()):
-                      conn.send("ACK:NAME:I"+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n")
+                       backstr = "ACK:NAME:I"
                    else:
-                      conn.send("NACK:NAME:I"+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n")
+                       backstr = "NACK:NAME:I"
+                   backstr=backstr+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n"
+                   conn.send(backstr.encode('UTF-8'))
              if command[1] == "SAVE":
                 print("save config")
                 if self.kreuz.f_write_config(str(command[2]).rstrip()):
-                   conn.send("ACK:SAVE:"+str(command[2]).rstrip())
+                   backstr = "ACK:SAVE:"+str(command[2]).rstrip()
                 else:
-                   conn.send("NACK:SAVE:"+str(command[2]).rstrip())
+                   backstr = "NACK:SAVE:"+str(command[2]).rstrip()
+                conn.send(backstr.encode('UTF-8'))
              if command[1] == "LOAD":
                 print("load config")
                 if self.kreuz.f_read_config(str(command[2]).rstrip()):
-                   conn.send("ACK:LOAD:"+str(command[2]).rstrip())
+                   backstr = "ACK:LOAD:"+str(command[2]).rstrip()
                 else:
-                   conn.send("NACK:LOAD:"+str(command[2]).rstrip())
+                   backstr = "NACK:LOAD:"+str(command[2]).rstrip()
+                conn.send(backstr.encode('UTF-8'))
           if command[0] == "SET" and command[1] != "LOCK" and self.lock != "":
              conn.send("NACK:LOCK:LOCK")
           if command[0] == "GET":
              if command[1] == "DATA":
                 print("get data")
                 daten = self.kreuz.f_get_data()
-                conn.send("ACK:DATA:"+daten[0]+":"+daten[1]+":"+daten[2])
+                datenstring = "ACK:DATA:" + str(daten[3]) + ":"
+                i = 0
+                while i < daten[3]:
+                    datenstring = datenstring + str(daten[0][i]) + ":"
+                    i = i + 1
+                i = 0
+                while i < daten[3]:
+                    datenstring = datenstring + str(daten[1][i]) + ":"
+                    i = i + 1
+                i = 0
+                while i < daten[3]:
+                    datenstring = datenstring + str(daten[2][i]) + ":"
+                    i = i + 1
+                print(datenstring)
+                conn.send(datenstring.encode('UTF-8'))
              if command[1] == "CONFIG":
                 print("get config files")
                 config = self.kreuz.f_get_config()
@@ -82,12 +104,13 @@ class kreuz_tcp_server:
 
       def f_listen_forever(self):
           conn, addr = self.sock.accept()
-          print 'Connection address:', addr
+          print('Connection address: %s', addr)
           self.f_analyse("GET:DATA:",conn)
           while 1:
                 data = conn.recv(self.BUFFER_SIZE)
                 #if not data: break
-                self.f_analyse(data,conn)
+                datastr = data.decode(encoding='UTF-8',errors='ignore')
+                self.f_analyse(datastr,conn)
           conn.close()
           self.kreuz.end()
 
