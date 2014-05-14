@@ -6,6 +6,7 @@ from tcp_switch_client import kreuz_tcp_client
 kreuzclient = kreuz_tcp_client()
 daten = kreuzclient.f_get_data()
 laenge = kreuzclient.f_get_length()
+kreuzclient.end()
 
 print("Content-type:text/html\r\n\r\n")
 print('<html>')
