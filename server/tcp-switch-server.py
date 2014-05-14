@@ -13,10 +13,10 @@ class kreuz_tcp_server:
              if command[1] == "LOCK":
                 print("lock/unlock device")
                 if self.lock == "":
-                   self.lock = str(chomp(command[2]))
+                   self.lock = str(command[2]).rstrip()
                    conn.send("ACK:LOCK:LOCK")
                 else:
-                   if self.lock == str(chomp(command[2])):
+                   if self.lock == str(command[2]).rstrip():
                       self.lock == ""
                       conn.send("ACK:LOCK:UNLOCK")
                    else:
@@ -34,28 +34,28 @@ class kreuz_tcp_server:
                 print("set name")
                 if command[2][1]=="O":
                    print("set output name")
-                   if self.kreuz.f_set_output_name(int(command[2][1:]),str(chomp(command[3]))):
-                      conn.send("ACK:NAME:O"++str(int(command[2][1:])).zfill(2)+":str(chomp(command[3]))+"\r\n")
+                   if self.kreuz.f_set_output_name(int(command[2][1:]),str(command[3]).rstrip()):
+                      conn.send("ACK:NAME:O"+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n")
                    else:
-                      conn.send("NACK:NAME:O"++str(int(command[2][1:])).zfill(2)+":str(chomp(command[3]))+"\r\n")
+                      conn.send("NACK:NAME:O"+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n")
                 if command[2][1]=="I":
                    print("set input name")
-                   if self.kreuz.f_set_input_name(int(command[2][1:]),str(chomp(command[3]))):
-                      conn.send("ACK:NAME:I"++str(int(command[2][1:])).zfill(2)+":str(chomp(command[3]))+"\r\n")
+                   if self.kreuz.f_set_input_name(int(command[2][1:]),str(command[3]).rstrip()):
+                      conn.send("ACK:NAME:I"+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n")
                    else:
-                      conn.send("NACK:NAME:I"++str(int(command[2][1:])).zfill(2)+":str(chomp(command[3]))+"\r\n")
+                      conn.send("NACK:NAME:I"+str(int(command[2][1:])).zfill(2)+":"+str(command[3]).rstrip()+"\r\n")
              if command[1] == "SAVE":
                 print("save config")
-                if self.kreuz.f_write_config(str(chomp(command[2]))):
-                   conn.send("ACK:SAVE:"+str(chomp(command[2])))
+                if self.kreuz.f_write_config(str(command[2]).rstrip()):
+                   conn.send("ACK:SAVE:"+str(command[2]).rstrip())
                 else:
-                   conn.send("NACK:SAVE:"+str(chomp(command[2])))
+                   conn.send("NACK:SAVE:"+str(command[2]).rstrip())
              if command[1] == "LOAD":
                 print("load config")
-                if self.kreuz.f_read_config(str(chomp(command[2]))):
-                   conn.send("ACK:LOAD:"+str(chomp(command[2])))
+                if self.kreuz.f_read_config(str(command[2]).rstrip()):
+                   conn.send("ACK:LOAD:"+str(command[2]).rstrip())
                 else:
-                   conn.send("NACK:LOAD:"+str(chomp(command[2])))
+                   conn.send("NACK:LOAD:"+str(command[2]).rstrip())
           if command[0] == "SET" and command[1] != "LOCK" and self.lock != "":
              conn.send("NACK:LOCK:LOCK")
           if command[0] == "GET":

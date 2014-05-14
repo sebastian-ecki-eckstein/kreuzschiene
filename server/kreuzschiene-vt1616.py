@@ -29,7 +29,7 @@ class kreuzschiene:
           for i in range(self.length):
               self.output.append(0)
               self.outputname.append("out_"+str(i))
-              self.inputname.append("in_"str(i))
+              self.inputname.append("in_"+str(i))
           parsed = self.f_parse_status(bytestring)
           self.f_compare_output(parsed)
           return True
@@ -137,7 +137,7 @@ class kreuzschiene:
              print("output not found")
              return False
           else:
-             self.outputname[number] = str(chomp(name))
+             self.outputname[number] = str(name).rstrip()
              return True
 
       def f_set_input_name(self,number,name):
@@ -145,7 +145,7 @@ class kreuzschiene:
              print("input not found")
              return False
           else:
-             self.inputname[number] = str(chomp(name))
+             self.inputname[number] = str(name).rstrip()
              return True
 
       def end(self):
@@ -177,8 +177,8 @@ class kreuzschiene:
              #print(outlist)
              #print(inlist)
              ergebnis = self.f_sort_lists(outlist,inlist)
-             sort_outputname = self.f_sort_lists(outlist,outputname)
-             sort_inputname = self.f_sort_lists(inputlist,inputname)
+             sort_outputname = self.f_sort_lists(outlist,outputname)[1]
+             sort_inputname = self.f_sort_lists(inputlist,inputname)[1]
              #print(ergebnis[0])
              #print(ergebnis[1])
              #print(ergebnis[2])
@@ -203,7 +203,7 @@ class kreuzschiene:
           configfile.write("<kreuzschiene>\n")
           i = 0
           while i < self.length:
-              configfile.write("  <output id='"+str(i)+"' expr='"+str(self.output[i])+"'+" name='"+str(self.outputname[i])+"'/>\n")
+              configfile.write("  <output id='"+str(i)+"' expr='"+str(self.output[i])+"' name='"+str(self.outputname[i])+"'/>\n")
               configfile.write("  <input id='"+str(i)+"' name='"+str(self.inputname[i])+"'/>\n")
               i = i + 1
           configfile.write("</kreuzschiene>\n")
@@ -233,6 +233,6 @@ class kreuzschiene:
 
 if __name__ == '__main__':
    kreuz = kreuzschiene()
-   kreuz.f_write_config("test")
+   kreuz.f_read_config("test")
    kreuz.end()
 
