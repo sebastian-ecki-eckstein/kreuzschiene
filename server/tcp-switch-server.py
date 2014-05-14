@@ -115,5 +115,5 @@ class kreuz_tcp_server:
           self.kreuz.end()
 
 if __name__ == '__main__':
-   con = kreuz_tcp_server()
+   con = kreuz_tcp_server('',4242)
    con.f_listen_forever()
