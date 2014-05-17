@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import socket
+import time
 
 class kreuz_tcp_client:
 
@@ -23,6 +24,7 @@ class kreuz_tcp_client:
         return self.length
 
     def f_get_data(self):
+        #print("f_get_data")
         self.sock.send("GET:DATA:".encode('UTF-8'))
         data = self.sock.recv(self.BUFFER_SIZE)
         datastr = data.decode(encoding='UTF-8',errors='ignore')
@@ -52,6 +54,7 @@ class kreuz_tcp_client:
             outputname[i] = splitted[(i+self.length)+3]
             inputname[i] = splitted[i+(self.length*2)+3]
             i = i + 1
+        #time.sleep(10)
         return [output,outputname,inputname]
 
     def f_set_output_name(self,number,name):
@@ -144,7 +147,11 @@ class kreuz_tcp_client:
         return True
 
     def end(self):
+        #print("close socket")
         self.sock.close()
 
 if __name__ == '__main__':
     print("start client")
+    kreuz = kreuz_tcp_client()
+    kreuz.f_get_data()
+    kreuz.end()
