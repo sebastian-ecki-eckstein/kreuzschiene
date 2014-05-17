@@ -16,7 +16,7 @@ class kreuzschiene:
           self.f_generate_matrix()
 
       def f_get_data(self):
-          return [self.output,self.outputname,self.inputname]
+          return [self.output,self.outputname,self.inputname,self.length]
 
       def f_get_config(self):
           return [test]
