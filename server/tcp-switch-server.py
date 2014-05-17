@@ -103,17 +103,22 @@ class kreuz_tcp_server:
           self.sock.listen(5)
 
       def f_listen_forever(self):
-          conn, addr = self.sock.accept()
-          print('Connection address: %s', addr)
-          self.f_analyse("GET:DATA:",conn)
-          while 1:
-                data = conn.recv(self.BUFFER_SIZE)
-                #if not data: break
-                datastr = data.decode(encoding='UTF-8',errors='ignore')
-                self.f_analyse(datastr,conn)
-          conn.close()
+          while True:
+             conn, addr = self.sock.accept()
+             try:
+               print('Connection address: %s', addr)
+               self.f_analyse("GET:DATA:",conn)
+               while 1:
+                  data = conn.recv(self.BUFFER_SIZE)
+                  if data:
+                     datastr = data.decode(encoding='UTF-8',errors='ignore')
+                     self.f_analyse(datastr,conn)
+                  else:
+                     break
+             finally:
+               conn.close()
           self.kreuz.end()
 
 if __name__ == '__main__':
-   con = kreuz_tcp_server()
+   con = kreuz_tcp_server('',4242)
    con.f_listen_forever()
