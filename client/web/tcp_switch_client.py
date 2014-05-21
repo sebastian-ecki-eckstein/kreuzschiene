@@ -33,7 +33,10 @@ class kreuz_tcp_client:
         outputname = []
         inputname = []
         if len(splitted)>3:
-            anzahl = int(splitted[2])
+            if splitted[1] == "DATA":
+               anzahl = int(splitted[2])
+            else:
+               return False
         else:
             return False
         if self.length == -1:
@@ -98,7 +101,9 @@ class kreuz_tcp_client:
         splitted = datastr.split(':')
         if splitted[0] == "NACK":
             return False
-        ergebnis = self.f_get_data()
+        ergebnis = True
+        while ergebnis == True or ergebnis == False:
+            ergebnis = self.f_get_data()
         self.output = ergebnis[0]
         return True
 
@@ -155,3 +160,4 @@ if __name__ == '__main__':
     kreuz = kreuz_tcp_client()
     kreuz.f_get_data()
     kreuz.end()
+
