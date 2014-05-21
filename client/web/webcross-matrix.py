@@ -16,7 +16,7 @@ form = cgi.FieldStorage()
 print("Content-type:text/html\r\n\r\n")
 print('<html>')
 print('<head>')
-print('<title>Kreuzschien</title>')
+print('<title>Kreuzschiene Matrix Anzeige</title>')
 print('</head>')
 print('<body>')
 print('<h2>Hello Word! This is a test</h2>')
@@ -37,7 +37,7 @@ if form.getvalue('length'):
 
 daten = kreuzclient.f_get_data()
 
-print('<form action="webcross.py" method="post" accept-charset="ISO-8859-1">')
+print('<form action="webcross-matrix.py" method="post" accept-charset="ISO-8859-1">')
 print("<table>\n<tr>\n<th>OUTPUT</th>\n")
 i = 0
 while i < laenge:
