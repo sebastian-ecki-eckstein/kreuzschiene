@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import socket
-from kreuzschiene_vt1616 import kreuzschiene
+from kreuzschiene_vd1616 import kreuzschiene
 
 class kreuz_tcp_server:
 
