@@ -17,9 +17,6 @@ print("Content-type:text/html\r\n\r\n")
 print('<html>')
 print('<head>')
 print('<title>Kreuzschiene Matrix Anzeige</title>')
-print('</head>')
-print('<body>')
-print('<h2>Hello Word! This is a test</h2>')
 
 if form.getvalue('load'):
     #print(laenge)
@@ -38,7 +35,7 @@ else:
     daten = kreuzclient.f_get_data()
     config = kreuzclient.f_get_config()
 
-    print('<form action="webcrossload.py" method="post" accept-charset="ISO-8859-1">')
+    print('<form action="webcross-load.py" method="post" accept-charset="ISO-8859-1">')
     print("<select name='load' size='1'>")
     i = 0
     while i < len(config):

@@ -127,8 +127,22 @@ class kreuz_tcp_client:
         return True
 
     def f_save(self,name):
-        print("save config")
-        sendstr = "SET:SAVE:"+str(name)
+        #print("save config")
+        if len(name)<4:
+           return False
+        if name[-4:] == ".cfg" or name[-4:] == ".xml":
+           name = name[0:-4]
+        i = 0
+        sneu = ""
+        while i < len(name):
+            if name[i] >= 'a' and name[i] <= 'z':
+               sneu = sneu + name[i]
+            if name[i] >= 'A' and name[i] <= 'Z':
+               sneu = sneu + name[i]
+            if name[i] >= '0' and name[i] <= '9':
+               sneu = sneu + name[i]
+            i = i + 1
+        sendstr = "SET:SAVE:"+str(sneu)
         self.sock.send(sendstr.encode('UTF-8'))
         data = self.sock.recv(self.BUFFER_SIZE)
         datastr = data.decode(encoding='UTF-8',errors='ignore')
@@ -138,7 +152,7 @@ class kreuz_tcp_client:
         return True
 
     def f_get_config(self):
-        print("get config names")
+        #print("get config names")
         sendstr = "GET:CONFIG:"
         self.sock.send(sendstr.encode('UTF-8'))
         data = self.sock.recv(self.BUFFER_SIZE)
