@@ -142,7 +142,12 @@ class kreuz_tcp_client:
         sendstr = "GET:CONFIG:"
         self.sock.send(sendstr.encode('UTF-8'))
         data = self.sock.recv(self.BUFFER_SIZE)
-        return "test"
+        datastr = data.decode(encoding='UTF-8',errors='ignore')
+        splitted = datastr.split(':')
+        if splitted[0] == "NACK":
+            return False
+        else:
+            return splitted[2:]
 
     def f_lock(self,locker):
         print("lock/unlock")
@@ -159,5 +164,6 @@ if __name__ == '__main__':
     print("start client")
     kreuz = kreuz_tcp_client()
     kreuz.f_get_data()
+    print(kreuz.f_get_config())
     kreuz.end()
 

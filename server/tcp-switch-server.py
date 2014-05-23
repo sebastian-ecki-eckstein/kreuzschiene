@@ -87,8 +87,19 @@ class kreuz_tcp_server:
                 conn.send(datenstring.encode('UTF-8'))
              if command[1] == "CONFIG":
                 print("get config files")
-                config = self.kreuz.f_get_config()
-                conn.send("ACK:DATA:"+config)
+                configs = self.kreuz.f_get_config()
+                config = ""
+                if len(configs)>0:
+                    i = 0
+                    while i<len(configs):
+                        config = config + configs[i]
+                        i = i + 1
+                        if i<len(configs):
+                            config = config + ":"
+                    datenstr="ACK:CONFIG:"+config
+                else:
+                    datenstr="NACK:CONFIG:"
+                conn.send(datenstr.encode('UTF-8'))
 
       def __init__(self,ip='127.0.0.1',port=4242):
           self.TCP_IP = ip
