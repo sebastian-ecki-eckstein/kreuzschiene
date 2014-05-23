@@ -1,9 +1,11 @@
+#!/usr/bin/env python
 
 import time
 import serial
 import binascii
 import xml.dom.minidom as dom
 import os.path
+from glob import glob
 
 directory = "/home/ecki/kreuzschiene/config/"
 
@@ -19,7 +21,13 @@ class kreuzschiene:
           return [self.output,self.outputname,self.inputname,self.length]
 
       def f_get_config(self):
-          return [test]
+          newlist = glob(directory+'*.cfg')
+          newlist.sort()
+          datenconf = []
+          for i in newlist:
+              ia = i.split('/')
+              datenconf.append(ia[len(ia)-1].split('.')[0])
+          return datenconf
 
       def f_generate_matrix(self):
           print("generate output, input matrix")
@@ -233,6 +241,7 @@ class kreuzschiene:
 
 if __name__ == '__main__':
    kreuz = kreuzschiene()
-   kreuz.f_read_config("test")
+   print(kreuz.f_get_config())
+   #kreuz.f_read_config("test")
    kreuz.end()
 
